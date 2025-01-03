@@ -1,26 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Eiffel Tower VR Scene</title>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Eiffel Tower VR Scene</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
 </head>
 <body>
-  <a-scene>
-   <a-camera id="camera" position="0 1.6 0" wasd-controls="acceleration: 20" aabb-collider="objects: .collidable"></a-camera>
-    <!-- Flooring -->
-    <a-gltf-model 
-      src="https://cdn.glitch.global/628e1600-3177-4d17-ab74-7432cf0bcda8/low_poly_eiffel_tower.glb?v=1735896314497" 
-      position="0 0 1" 
-      scale="1 1 1">
-    </a-gltf-model>
-  </a-scene>
+    <a-scene></a-scene>
+        <a-camera id="camera" position="0 1.6 0" wasd-controls="acceleration: 20" aabb-collider="objects: .collidable"></a-camera>
+        <!-- Flooring -->
+        <a-gltf-model 
+            src="https://cdn.glitch.global/628e1600-3177-4d17-ab74-7432cf0bcda8/low_poly_eiffel_tower.glb?v=1735896314497" 
+            position="0 0 1" 
+            scale="1 1 1">
+        </a-gltf-model>
+    </a-scene>
 </body>
-  
+    
 <script>
     $(document).ready(function() {
         console.log("Hello WorldASD");
+
+        function moveCameraForward() {
+            let camera = document.querySelector('#camera');
+            let position = camera.getAttribute('position');
+            let direction = new THREE.Vector3();
+            camera.object3D.getWorldDirection(direction);
+            direction.multiplyScalar(0.1); // Adjust the speed here
+            position.x += direction.x;
+            position.y += direction.y;
+            position.z += direction.z;
+            camera.setAttribute('position', position);
+        }
+
+        setInterval(moveCameraForward, 100); // Adjust the interval here
 
         $(document).keydown(function(event) {
             if (event.code === 'Space') {
@@ -50,5 +64,4 @@
         });
     });
 </script>
-  </script>
 </html>
