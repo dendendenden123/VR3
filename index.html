@@ -1,45 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A-Frame Model Upload</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/n5ro/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+  <meta charset="UTF-8">
+  <title>Eiffel Tower VR Scene</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
 </head>
 <body>
-    <a-scene>
-        <!-- Add lighting -->
-        <a-light type="directional" position="0 5 5" intensity="1"></a-light>
-        <a-light type="ambient" intensity="0.5"></a-light>
-
-        <!-- Add the model -->
-        <gltf-model src="low_poly_eiffel_tower.glb" position="0 0 1" scale="1 1 1" rotation="0 0 0"></gltf-model> 
-
-        <!-- Ground and camera -->
-        <a-plane rotation="-90 0 0" width="10" height="10" color="#7BC8A4"></a-plane>
-        <a-camera id="camera" position="0 1.6 0" wasd-controls="acceleration: 20" aabb-collider="objects: .collidable"></a-camera>
-    </a-scene>
-    <script>
-        $(document).ready(function() {
-            console.log("Hello WorldASD");
-
-            $(document).keydown(function(event) {
-                if (event.code === 'Space') {
-                    let camera = document.querySelector('#camera');
-                    let position = camera.getAttribute('position');
-                    position.y += 1; // Jump height
-                    camera.setAttribute('position', position);
-
-                    // Return to original position after a short delay
-                    setTimeout(function() {
-                        position.y -= 1;
-                        camera.setAttribute('position', position);
-                    }, 500); // Adjust delay as needed
-                }
-            });
-        });
-    </script>
+  <a-scene>
+   <a-camera id="camera" position="0 1.6 0" wasd-controls="acceleration: 20" aabb-collider="objects: .collidable"></a-camera>
+    <!-- Flooring -->
+    <a-gltf-model 
+      src="https://cdn.glitch.global/628e1600-3177-4d17-ab74-7432cf0bcda8/low_poly_eiffel_tower.glb?v=1735896314497" 
+      position="0 0 1" 
+      scale="1 1 1">
+    </a-gltf-model>
+  </a-scene>
 </body>
+  
+<script>
+    $(document).ready(function() {
+        console.log("Hello WorldASD");
+
+        $(document).keydown(function(event) {
+            if (event.code === 'Space') {
+                let camera = document.querySelector('#camera');
+                let position = camera.getAttribute('position');
+                let initialY = position.y;
+                let jumpHeight = 1;
+                let jumpDuration = 500;
+
+                // Animate jump up
+                $(camera).animate({ y: initialY + jumpHeight }, {
+                    duration: jumpDuration / 2,
+                    step: function(now) {
+                        camera.setAttribute('position', { x: position.x, y: now, z: position.z });
+                    },
+                    complete: function() {
+                        // Animate jump down
+                        $(camera).animate({ y: initialY }, {
+                            duration: jumpDuration / 2,
+                            step: function(now) {
+                                camera.setAttribute('position', { x: position.x, y: now, z: position.z });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    });
+</script>
+  </script>
 </html>
