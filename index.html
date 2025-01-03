@@ -7,7 +7,7 @@
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
 </head>
 <body>
-    <a-scene></a-scene>
+    <a-scene>
         <a-camera id="camera" position="0 1.6 0" wasd-controls="acceleration: 20" aabb-collider="objects: .collidable"></a-camera>
         <!-- Flooring -->
         <a-gltf-model 
@@ -15,6 +15,10 @@
             position="0 0 1" 
             scale="1 1 1">
         </a-gltf-model>
+
+    
+    <a-image id="info" src="request.png" position="0 2 -5" width="2" height="2" look-at="#camera"></a-image>
+    <a-text id="hoverText" value="Information about the Eiffel Tower" position="0 1.5 -3" visible="false"></a-text>
     </a-scene>
 </body>
     
