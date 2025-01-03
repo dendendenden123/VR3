@@ -10,7 +10,8 @@
 
 <body>
     <a-scene>
-        <a-camera id="camera" position="0 1.6 0" wasd-controls="acceleration: 20" aabb-collider="objects: .collidable">
+        <a-camera id="camera" position="-6.5 1.6 21" wasd-controls="acceleration: 20"
+            aabb-collider="objects: .collidable">
 
             <a-entity cursor="rayOrigin: mouse" raycaster="objects: .hoverable" position="0 0 -1"
                 geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" material="color: red; shader: flat">
@@ -38,13 +39,26 @@
 
 
 
-
+        //info1
         <a-text look-at="#camera" id="info1"
             value="The Eiffel Tower quickly became an iconic symbol of Paris and France, captivating visitors from around the world with its grandeur and offering breathtaking panoramic views of the city."
             position="-6 4 5" visible="true" align="center" geometry="primitive: plane; height: 2px; width: 5px;"
             material="shader: flat; side: double; transparent: true; opacity: 0.7; color: black; border-radius: 0.2; height: 0"
             text="wrapCount: 50; baseline: top; lineHeight: 50; fontSize: 2; padding: 5px">
         </a-text>
+
+
+        //infow
+        <a-text look-at="#camera" id="info1"
+            value="Eiffel Tower stands 330 meters (1,083 feet) tall, making it the tallest structure in Paris."
+            position="-10 2 13" rotation="0 90 0" visible="true" align="center"
+            geometry="primitive: plane; height: 2px; width: 5px;"
+            material="shader: flat; side: double; transparent: true; opacity: 0.7; color: black; border-radius: 0.2; height: 0"
+            text="wrapCount: 50; baseline: top; lineHeight: 50; fontSize: 2; padding: 5px">
+        </a-text>
+
+
+
 
 
 
