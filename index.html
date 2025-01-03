@@ -1,71 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Eiffel Tower VR Scene</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-</head>
-<body>
+  </head>
+  <body>
     <a-scene>
-        <a-camera id="camera" position="0 1.6 0" wasd-controls="acceleration: 20" aabb-collider="objects: .collidable"></a-camera>
-        <!-- Flooring -->
-        <a-gltf-model 
-            src="https://cdn.glitch.global/628e1600-3177-4d17-ab74-7432cf0bcda8/low_poly_eiffel_tower.glb?v=1735896314497" 
-            position="0 0 1" 
-            scale="1 1 1">
-        </a-gltf-model>
+      <a-camera
+        id="camera"
+        position="0 1.6 0"
+        wasd-controls="acceleration: 20"
+        aabb-collider="objects: .collidable"
+      ></a-camera>
+      <!-- Flooring -->
+      <a-gltf-model
+        src="https://cdn.glitch.global/628e1600-3177-4d17-ab74-7432cf0bcda8/low_poly_eiffel_tower.glb?v=1735896314497"
+        position="0 0 1"
+        scale="1 1 1"
+      >
+      </a-gltf-model>
 
-    
-    <a-image id="info" src="request.png" position="0 2 -5" width="2" height="2" look-at="#camera"></a-image>
-    <a-text id="hoverText" value="Information about the Eiffel Tower" position="0 1.5 -3" visible="false"></a-text>
+      <a-text look-at="#camera"
+              id="info1"
+            value="The Eiffel Tower quickly became an iconic symbol of Paris and France, captivating visitors from around the world with its grandeur and offering breathtaking panoramic views of the city."
+            position="-6 4 3" visible="true" align="center" geometry="primitive: plane; height: 2px; width: 5px;"
+            material="shader: flat; side: double; transparent: true; opacity: 0.7; color: black; border-radius: 0.2; height: 0"
+            text="wrapCount: 50; baseline: top; lineHeight: 50; fontSize: 2; padding: 5px">
+      </a-text>
+
     </a-scene>
-</body>
+  </body>
+
+  <script>
     
-<script>
-    $(document).ready(function() {
-        console.log("Hello WorldASD");
-
-        function moveCameraForward() {
-            let camera = document.querySelector('#camera');
-            let position = camera.getAttribute('position');
-            let direction = new THREE.Vector3();
-            camera.object3D.getWorldDirection(direction);
-            direction.multiplyScalar(0.1); // Adjust the speed here
-            position.x += direction.x;
-            position.y += direction.y;
-            position.z += direction.z;
-            camera.setAttribute('position', position);
-        }
-
-        setInterval(moveCameraForward, 100); // Adjust the interval here
-
-        $(document).keydown(function(event) {
-            if (event.code === 'Space') {
-                let camera = document.querySelector('#camera');
-                let position = camera.getAttribute('position');
-                let initialY = position.y;
-                let jumpHeight = 1;
-                let jumpDuration = 500;
-
-                // Animate jump up
-                $(camera).animate({ y: initialY + jumpHeight }, {
-                    duration: jumpDuration / 2,
-                    step: function(now) {
-                        camera.setAttribute('position', { x: position.x, y: now, z: position.z });
-                    },
-                    complete: function() {
-                        // Animate jump down
-                        $(camera).animate({ y: initialY }, {
-                            duration: jumpDuration / 2,
-                            step: function(now) {
-                                camera.setAttribute('position', { x: position.x, y: now, z: position.z });
-                            }
-                        });
-                    }
-                });
+    
+ 
+        AFRAME.registerComponent('#info1', {
+            init: function () {
+                this.camera = document.querySelector('#camera');
+            },
+            tick: function () {
+                let cameraRotation = this.camera.object3D.rotation;
+                this.el.object3D.rotation.y = cameraRotation.y;
             }
         });
+
+    
+    
+    
+    
+    
+    
+    $(document).ready(function () {
+      console.log("Hello WorldASD");
+
+      function moveCameraForward() {
+        let camera = document.querySelector("#camera");
+        let position = camera.getAttribute("position");
+        let direction = new THREE.Vector3();
+        camera.object3D.getWorldDirection(direction);
+        direction.multiplyScalar(0.1); // Adjust the speed here
+        position.x += direction.x;
+        position.y += direction.y;
+        position.z += direction.z;
+        camera.setAttribute("position", position);
+      }
+
+      //  setInterval(moveCameraForward, 100); // Adjust the interval here
+
+      $(document).keydown(function (event) {
+        if (event.code === "Space") {
+          let camera = document.querySelector("#camera");
+          let position = camera.getAttribute("position");
+          let initialY = position.y;
+          let jumpHeight = 1;
+          let jumpDuration = 500;
+
+          // Animate jump up
+          $(camera).animate(
+            { y: initialY + jumpHeight },
+            {
+              duration: jumpDuration / 2,
+              step: function (now) {
+                camera.setAttribute("position", {
+                  x: position.x,
+                  y: now,
+                  z: position.z,
+                });
+              },
+              complete: function () {
+                // Animate jump down
+                $(camera).animate(
+                  { y: initialY },
+                  {
+                    duration: jumpDuration / 2,
+                    step: function (now) {
+                      camera.setAttribute("position", {
+                        x: position.x,
+                        y: now,
+                        z: position.z,
+                      });
+                    },
+                  }
+                );
+              },
+            }
+          );
+        }
+      });
     });
-</script>
+  </script>
 </html>
