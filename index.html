@@ -11,36 +11,127 @@
 <body>
     <a-scene>
         <a-camera id="camera" position="0 1.6 0" wasd-controls="acceleration: 20" aabb-collider="objects: .collidable">
-            <!-- Pointer -->
-            <a-entity position="0 0 -3">
-                <a-entity geometry="primitive: ring; radiusInner: 0.05; radiusOuter: 0.1"
-                    material="color: red; opacity: 0.5"></a-entity>
 
+            <a-entity cursor="rayOrigin: mouse" raycaster="objects: .hoverable" position="0 0 -1"
+                geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" material="color: red; shader: flat">
+            </a-entity>
+
+            <a-text value="check"></a-text>
         </a-camera>
-        <!-- Flooring -->
-        <a-gltf-model src="low_poly_eiffel_tower.glb" position="0 0 1" scale="1 1 1">
+
+
+        //environments
+        <a-gltf-model
+            src="https://cdn.glitch.global/628e1600-3177-4d17-ab74-7432cf0bcda8/low_poly_eiffel_tower.glb?v=1735896314497"
+            position="0 0 1" scale="1 1 1">
         </a-gltf-model>
+
+
+        //elevator
+        <a-gltf-model id="elevator"
+            src="https://cdn.glitch.global/628e1600-3177-4d17-ab74-7432cf0bcda8/old_elevator%20(1).glb?v=1735935905371"
+            position="0 1 2" scale="0.01 0.01 0.01">
+        </a-gltf-model>
+
+        <a-box id="elevator-collider" position="0 1.6 2" depth="1" height="1" width="1" opacity="0" visible="false">
+        </a-box>
+
+
+
 
         <a-text look-at="#camera" id="info1"
             value="The Eiffel Tower quickly became an iconic symbol of Paris and France, captivating visitors from around the world with its grandeur and offering breathtaking panoramic views of the city."
-            position="-6 4 3" visible="true" align="center" geometry="primitive: plane; height: 2px; width: 5px;"
+            position="-6 4 5" visible="true" align="center" geometry="primitive: plane; height: 2px; width: 5px;"
             material="shader: flat; side: double; transparent: true; opacity: 0.7; color: black; border-radius: 0.2; height: 0"
             text="wrapCount: 50; baseline: top; lineHeight: 50; fontSize: 2; padding: 5px">
         </a-text>
 
+
+
+
+        <a-light type="ambient" color="#888" intensity="4"></a-light>
+        <a-sky color="#ECECEC"></a-sky>
     </a-scene>
 </body>
 
 <script>
-    AFRAME.registerComponent('look-at-camera', {
-        init: function () {
-            this.camera = document.querySelector('#camera');
-        },
-        tick: function () {
-            let cameraRotation = this.camera.object3D.rotation;
-            this.el.object3D.rotation.y = cameraRotation.y;
+
+
+    const elevator = document.querySelector("#elevator");
+    const camera = document.querySelector("#camera");
+
+
+
+
+    // Ascend animation
+    const ascendAnimation3 = {
+        property: "position",
+        to: "0 10 2", // Ascend position
+        dur: 2000,
+        easing: "easeInOutQuad",
+    };
+
+    // Ascend animation for camera
+    const ascendAnimationCamera3 = {
+        property: "position",
+        to: "0 10.6 2", // Ascend position
+        dur: 2000,
+        easing: "easeInOutQuad",
+    };
+
+
+
+    // Ascend animation
+    const ascendAnimation2 = {
+        property: "position",
+        to: "0 5 2", // Ascend position
+        dur: 2000,
+        easing: "easeInOutQuad",
+    };
+
+    // Ascend animation for camera
+    const ascendAnimationCamera2 = {
+        property: "position",
+        to: "0 5.6 2", // Ascend position
+        dur: 2000,
+        easing: "easeInOutQuad",
+    };
+
+    const descendAnimation = {
+        property: "position",
+        to: "0 1 2", // Original position
+        dur: 2000,
+        easing: "easeInOutQuad",
+    };
+
+    // Descend animation
+    const descendAnimationCamera = {
+        property: "position",
+        to: "0 1.6 2", // Original position
+        dur: 2000,
+        easing: "easeInOutQuad",
+    };
+
+
+    // Listen for keydown events
+    window.addEventListener("keydown", (event) => {
+        if (event.key === "2") {
+            elevator.setAttribute("animation", ascendAnimation2);
+            camera.setAttribute("animation", ascendAnimationCamera2);
+        } else if (event.key === "1") {
+            elevator.setAttribute("animation", descendAnimation);
+            camera.setAttribute("animation", descendAnimationCamera);
+        } else if (event.key === "3") {
+            elevator.setAttribute("animation", ascendAnimation3);
+            camera.setAttribute("animation", ascendAnimationCamera3);
         }
     });
+
+
+
+
+
+
 
     $(document).ready(function () {
         console.log("Hello WorldASD");
@@ -57,7 +148,7 @@
             camera.setAttribute("position", position);
         }
 
-        setInterval(moveCameraForward, 100); // Adjust the interval here
+        //  setInterval(moveCameraForward, 100); // Adjust the interval here
 
         $(document).keydown(function (event) {
             if (event.code === "Space") {
