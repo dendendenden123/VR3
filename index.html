@@ -155,13 +155,13 @@
             let position = camera.getAttribute("position");
             let direction = new THREE.Vector3();
             camera.object3D.getWorldDirection(direction);
-            direction.multiplyScalar(0.1); // Adjust the speed here
+            direction.multiplyScalar(1); // Adjust the speed here
             position.x -= direction.x;
             position.y -= direction.y;
             camera.setAttribute("position", position);
         }
 
-        setInterval(moveCameraForward, 300); // Adjust the interval here
+        setInterval(moveCameraForward, 100); // Adjust the interval here
 
         cosole.log("Hello eevrye");
 
