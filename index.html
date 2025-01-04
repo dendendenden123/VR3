@@ -156,9 +156,8 @@
             let direction = new THREE.Vector3();
             camera.object3D.getWorldDirection(direction);
             direction.multiplyScalar(0.1); // Adjust the speed here
-            position.x += direction.x;
-            position.y += direction.y;
-            position.z += direction.z;
+            position.x -= direction.x;
+            position.y -= direction.y;
             camera.setAttribute("position", position);
         }
 
