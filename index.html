@@ -1,213 +1,83 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+  <head>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const player = document.querySelector("#player");
+        let isWalking = false;
+        let walkSpeed = 0.05;
 
-<head>
-    <meta charset="UTF-8" />
-    <title>Eiffel Tower VR Scene</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-</head>
-
-<body>
-    <a-scene>
-        <a-camera id="camera" position="-6.5 1.6 21" wasd-controls="acceleration: 20"
-            aabb-collider="objects: .collidable">
-
-            <a-entity cursor="rayOrigin: mouse" raycaster="objects: .hoverable" position="0 0 -1"
-                geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" material="color: red; shader: flat">
-            </a-entity>
-
-            <a-text value="check"></a-text>
-        </a-camera>
-
-
-        //environments
-        <a-gltf-model
-            src="https://cdn.glitch.global/628e1600-3177-4d17-ab74-7432cf0bcda8/low_poly_eiffel_tower.glb?v=1735896314497"
-            position="0 0 1" scale="1 1 1">
-        </a-gltf-model>
-
-
-        //elevator
-        <a-gltf-model id="elevator"
-            src="https://cdn.glitch.global/628e1600-3177-4d17-ab74-7432cf0bcda8/old_elevator%20(1).glb?v=1735935905371"
-            position="0 1 2" scale="0.01 0.01 0.01">
-        </a-gltf-model>
-
-        <a-box id="elevator-collider" position="0 1.6 2" depth="1" height="1" width="1" opacity="0" visible="false">
-        </a-box>
-
-
-
-        //info1
-        <a-text look-at="#camera" id="info1"
-            value="The Eiffel Tower quickly became an iconic symbol of Paris and France, captivating visitors from around the world with its grandeur and offering breathtaking panoramic views of the city."
-            position="-6 4 5" visible="true" align="center" geometry="primitive: plane; height: 2px; width: 5px;"
-            material="shader: flat; side: double; transparent: true; opacity: 0.7; color: black; border-radius: 0.2; height: 0"
-            text="wrapCount: 50; baseline: top; lineHeight: 50; fontSize: 2; padding: 5px">
-        </a-text>
-
-
-        //infow
-        <a-text look-at="#camera" id="info1"
-            value="Eiffel Tower stands 330 meters (1,083 feet) tall, making it the tallest structure in Paris."
-            position="-10 2 13" rotation="0 90 0" visible="true" align="center"
-            geometry="primitive: plane; height: 2px; width: 5px;"
-            material="shader: flat; side: double; transparent: true; opacity: 0.7; color: black; border-radius: 0.2; height: 0"
-            text="wrapCount: 50; baseline: top; lineHeight: 50; fontSize: 2; padding: 5px">
-        </a-text>
-
-
-
-
-
-
-
-        <a-light type="ambient" color="#888" intensity="4"></a-light>
-        <a-sky color="#ECECEC"></a-sky>
-    </a-scene>
-</body>
-
-<script>
-
-
-    const elevator = document.querySelector("#elevator");
-    const camera = document.querySelector("#camera");
-
-
-
-
-    // Ascend animation
-    const ascendAnimation3 = {
-        property: "position",
-        to: "0 10 2", // Ascend position
-        dur: 2000,
-        easing: "easeInOutQuad",
-    };
-
-    // Ascend animation for camera
-    const ascendAnimationCamera3 = {
-        property: "position",
-        to: "0 10.6 2", // Ascend position
-        dur: 2000,
-        easing: "easeInOutQuad",
-    };
-
-
-
-    // Ascend animation
-    const ascendAnimation2 = {
-        property: "position",
-        to: "0 5 2", // Ascend position
-        dur: 2000,
-        easing: "easeInOutQuad",
-    };
-
-    // Ascend animation for camera
-    const ascendAnimationCamera2 = {
-        property: "position",
-        to: "0 5.6 2", // Ascend position
-        dur: 2000,
-        easing: "easeInOutQuad",
-    };
-
-    const descendAnimation = {
-        property: "position",
-        to: "0 1 2", // Original position
-        dur: 2000,
-        easing: "easeInOutQuad",
-    };
-
-    // Descend animation
-    const descendAnimationCamera = {
-        property: "position",
-        to: "0 1.6 2", // Original position
-        dur: 2000,
-        easing: "easeInOutQuad",
-    };
-
-
-    // Listen for keydown events
-    window.addEventListener("keydown", (event) => {
-        if (event.key === "2") {
-            elevator.setAttribute("animation", ascendAnimation2);
-            camera.setAttribute("animation", ascendAnimationCamera2);
-        } else if (event.key === "1") {
-            elevator.setAttribute("animation", descendAnimation);
-            camera.setAttribute("animation", descendAnimationCamera);
-        } else if (event.key === "3") {
-            elevator.setAttribute("animation", ascendAnimation3);
-            camera.setAttribute("animation", ascendAnimationCamera3);
+        // Request permission for device orientation on iOS
+        if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
+          DeviceMotionEvent.requestPermission()
+            .then((permissionState) => {
+              if (permissionState === "granted") {
+                startWalking();
+              }
+            })
+            .catch(console.error);
+        } else {
+          startWalking();
         }
-    });
 
+        function startWalking() {
+          window.addEventListener("deviceorientation", (event) => {
+            const tiltForward = event.beta; // Forward tilt angle
+            const tiltSide = event.gamma; // Side tilt angle
 
+            // Debug logs (remove for production)
+            console.log(`Tilt Forward (beta): ${tiltForward}`);
+            console.log(`Tilt Side (gamma): ${tiltSide}`);
 
+            // Determine if walking forward based on tilt range
+            isWalking = tiltForward > 15 && tiltForward < 70;
 
-
-
-
-    $(document).ready(function () {
-        console.log("Hello WorldASD");
-
-   
-        function moveCameraForward() {
-        let camera = document.querySelector("#camera");
-        let position = camera.getAttribute("position");
-        let direction = new THREE.Vector3();
-        camera.object3D.getWorldDirection(direction);
-        direction.multiplyScalar(0.15); // Adjust the speed here
-        position.x -= direction.x;
-        // position.y -= direction.y;
-        position.z -= direction.z;
-        camera.setAttribute("position", position);
-      }
-
-       setInterval(moveCameraForward, 100); / // A
-
-        cosole.log("Hello eevrye");
-
-        $(document).keydown(function (event) {
-            if (event.code === "Space") {
-                let camera = document.querySelector("#camera");
-                let position = camera.getAttribute("position");
-                let initialY = position.y;
-                let jumpHeight = 1;
-                let jumpDuration = 500;
-
-                // Animate jump up
-                $(camera).animate(
-                    { y: initialY + jumpHeight },
-                    {
-                        duration: jumpDuration / 2,
-                        step: function (now) {
-                            camera.setAttribute("position", {
-                                x: position.x,
-                                y: now,
-                                z: position.z,
-                            });
-                        },
-                        complete: function () {
-                            // Animate jump down
-                            $(camera).animate(
-                                { y: initialY },
-                                {
-                                    duration: jumpDuration / 2,
-                                    step: function (now) {
-                                        camera.setAttribute("position", {
-                                            x: position.x,
-                                            y: now,
-                                            z: position.z,
-                                        });
-                                    },
-                                }
-                            );
-                        },
-                    }
-                );
+            // Adjust walking speed (optional)
+            if (tiltForward > 30 && tiltForward < 60) {
+              walkSpeed = 0.1; // Faster speed for steeper tilt
+            } else {
+              walkSpeed = 0.05; // Default speed
             }
-        });
-    });
-</script>
+          });
 
+          // Update player's position based on walking
+          function updatePosition() {
+            if (isWalking) {
+              const position = player.getAttribute("position");
+              const rotation = player.getAttribute("rotation");
+
+              // Calculate movement direction based on rotation
+              const radianRotationY = (rotation.y * Math.PI) / 180; // Convert to radians
+              position.x -= walkSpeed * Math.sin(radianRotationY);
+              position.z -= walkSpeed * Math.cos(radianRotationY);
+
+              player.setAttribute("position", position);
+            }
+
+            requestAnimationFrame(updatePosition);
+          }
+
+          updatePosition();
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <a-scene
+      renderer="logarithmicDepthBuffer: true; xr: true"
+      xr-mode="immersive-ar"
+      webxr="optionalFeatures: hit-test; requiredFeatures: local-floor">
+      <!-- Player -->
+      <a-entity id="player" position="0 1.6 0" camera look-controls></a-entity>
+
+      <!-- Ground -->
+      <a-plane position="0 0 -4" rotation="-90 0 0" width="50" height="50" color="#7BC8A4"></a-plane>
+
+      <!-- Example Objects -->
+      <a-box position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
+      <a-sphere position="2 1 -5" radius="1.25" color="#EF2D5E"></a-sphere>
+      <a-cylinder position="1 0.75 -2" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
+    </a-scene>
+  </body>
 </html>
