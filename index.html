@@ -84,232 +84,152 @@
     </a-scene>
 
     <script>
-      const elevator = document.querySelector("#elevator");
-      const camera = document.querySelector("#camera");
-
-      // Animation definitions
-      const ascendAnimation3 = {
-        property: "position",
-        to: "0 10 2",
-        dur: 2000,
-        easing: "easeInOutQuad",
-      };
-
-      const ascendAnimationCamera3 = {
-        property: "position",
-        to: "0 10.6 2",
-        dur: 2000,
-        easing: "easeInOutQuad",
-      };
-
-      const ascendAnimation2 = {
-        property: "position",
-        to: "0 5 2",
-        dur: 2000,
-        easing: "easeInOutQuad",
-      };
-
-      const ascendAnimationCamera2 = {
-        property: "position",
-        to: "0 5.6 2",
-        dur: 2000,
-        easing: "easeInOutQuad",
-      };
-
-      const descendAnimation = {
-        property: "position",
-        to: "0 1 2",
-        dur: 2000,
-        easing: "easeInOutQuad",
-      };
-
-      const descendAnimationCamera = {
-        property: "position",
-        to: "0 1.6 2",
-        dur: 2000,
-        easing: "easeInOutQuad",
-      };
-
-      // Move camera forward
-      function moveCameraForward() {
-        let position = camera.getAttribute("position");
-        let direction = new THREE.Vector3();
-        camera.object3D.getWorldDirection(direction);
-        direction.multiplyScalar(0.15);
-        position.x -= direction.x;
-        position.z -= direction.z;
-        camera.setAttribute("position", position);
-      }
-
-      // Variable to control walking
-      let walkingInterval = null;
-
-      // Keydown events for animations
-      window.addEventListener("keydown", (event) => {
-        if (event.key === "2") {
-          elevator.setAttribute("animation", ascendAnimation2);
-          camera.setAttribute("animation", ascendAnimationCamera2);
-        } else if (event.key === "1") {
-          elevator.setAttribute("animation", descendAnimation);
-          camera.setAttribute("animation", descendAnimationCamera);
-        } else if (event.key === "3") {
-          elevator.setAttribute("animation", ascendAnimation3);
-          camera.setAttribute("animation", ascendAnimationCamera3);
-        }
-      });
-
-      function jumpCamera() {
-        let position = camera.getAttribute("position");
-        let initialY = position.y;
-        let jumpHeight = 1;
-        let jumpDuration = 500;
-
-        $(camera).animate(
-          { y: initialY + jumpHeight },
-          {
-            duration: jumpDuration / 2,
-            step: function (now) {
-              camera.setAttribute("position", { x: position.x, y: now, z: position.z });
-            },
-            complete: function () {
-              $(camera).animate(
-                { y: initialY },
-                {
-                  duration: jumpDuration / 2,
-                  step: function (now) {
-                    camera.setAttribute("position", { x: position.x, y: now, z: position.z });
-                  },
-                }
-              );
-            },
-          }
-        );
-      }
-
-      $(document).keydown((event) => {
-        if (event.code === "Space") {
-          jumpCamera();
-        }
-      });
-
-      // Speech recognition
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechRecognition) {
-        const recognition = new Sp
-        eechRecognition();
-        recognition.lang = "en-US";
-        recognition.interimResults = true;
-        recognition.continuous = true;
-
-        const output = document.getElementById("output");
-        let clearTimeoutId;
-
-        recognition.onresult = (event) => {
-          let transcript = "";
-          for (let i = event.resultIndex; i < event.results.length; i++) {
-            transcript += event.results[i][0].transcript;
-          }
-          output.innerText = transcript;
-
-          if (transcript.includes("jump")) {
-            jumpCamera();
-          } else if (transcript.includes("1") || transcript.includes("one")) {
-            elevator.setAttribute("animation", descendAnimation);
-            camera.setAttribute("animation", descendAnimationCamera);
-          } else if (transcript.includes("2") || transcript.includes("two")) {
-            elevator.setAttribute("animation", ascendAnimation2);
-            camera.setAttribute("animation", ascendAnimationCamera2);
-          } else if (transcript.includes("3") || transcript.includes("three")) {
-            elevator.setAttribute("animation", ascendAnimation3);
-            camera.setAttribute("animation", ascendAnimationCamera3);
-          } else if (transcript.includes("walk")) {
-            if (!walkingInterval) {
-              walkingInterval = setInterval(moveCameraForward, 100);
-              console.log("Walking started");
-            }
-          } else if (transcript.includes("stop")) {
-            if (walkingInterval) {
-              clearInterval(walkingInterval);
-              walkingInterval = null;
-              console.log("Walking stopped");
-            }
-          }
-
-          clearTimeout(clearTimeoutId);
-          clearTimeoutId = setTimeout(() => {
-            output.innerText = "";
-          }, 500);
-        };
-
-        recognition.onerror = (event) => {
-          console.error("Speech recognition error:", event.error);
-          alert(`Error: ${event.error}`);
-        };
-
-        recognition.start();
-
-        recognition.onend = () => {
-          recognition.start();
-        };
-      } else {
-        alert("Your browser does not support the Web Speech API. Please use a modern browser.");
-      }
+      setupElevatorControls("#elevator", "#camera");
 
 
-      //falll
+  function setupElevatorControls(elevatorId, cameraId) {
+  const elevator = document.querySelector(elevatorId);
+  const camera = document.querySelector(cameraId);
 
+  const animations = {
+    ascend3: {
+      elevator: { property: "position", to: "0 10 2", dur: 2000, easing: "easeInOutQuad" },
+      camera: { property: "position", to: "0 10.6 2", dur: 2000, easing: "easeInOutQuad" },
+    },
+    ascend2: {
+      elevator: { property: "position", to: "0 5 2", dur: 2000, easing: "easeInOutQuad" },
+      camera: { property: "position", to: "0 5.6 2", dur: 2000, easing: "easeInOutQuad" },
+    },
+    descend: {
+      elevator: { property: "position", to: "0 1 2", dur: 2000, easing: "easeInOutQuad" },
+      camera: { property: "position", to: "0 1.6 2", dur: 2000, easing: "easeInOutQuad" },
+    },
+  };
 
-  // Threshold distance for falling
-  const FALL_DISTANCE = 20;
-
-// Function to calculate distance between two objects
-function calculateDistance(obj1, obj2) {
-  const pos1 = obj1.getAttribute("position");
-  const pos2 = obj2.getAttribute("position");
-  return Math.sqrt(
-    Math.pow(pos1.x - pos2.x, 2) +
-      Math.pow(pos1.y - pos2.y, 2) +
-      Math.pow(pos1.z - pos2.z, 2)
-  );
-}
-
-// Handle falling
-function handleFall() {
-  const overlay = document.createElement("div");
-  overlay.style.position = "fixed";
-  overlay.style.top = 0;
-  overlay.style.left = 0;
-  overlay.style.width = "100%";
-  overlay.style.height = "100%";
-  overlay.style.backgroundColor = "black";
-  overlay.style.color = "white";
-  overlay.style.display = "flex";
-  overlay.style.alignItems = "center";
-  overlay.style.justifyContent = "center";
-  overlay.style.fontSize = "48px";
-  overlay.style.zIndex = "9999";
-  document.body.appendChild(overlay);
-
-  let countdown = 5;
-  overlay.textContent = countdown;
-
-  const interval = setInterval(() => {
-    countdown--;
-    overlay.textContent = countdown;
-    if (countdown === 0) {
-      clearInterval(interval);
-      location.reload();
-    }
-  }, 1000);
-}
-
-// Periodically check the distance
-setInterval(() => {
-  const distance = calculateDistance(camera, elevator);
-  if (distance > FALL_DISTANCE) {
-    handleFall();
+  function moveCameraForward() {
+    const position = camera.getAttribute("position");
+    const direction = new THREE.Vector3();
+    camera.object3D.getWorldDirection(direction);
+    direction.multiplyScalar(0.15);
+    position.x -= direction.x;
+    position.z -= direction.z;
+    camera.setAttribute("position", position);
   }
-}, 1000); // Check every second
+
+  function applyAnimation(animationKey) {
+    const animation = animations[animationKey];
+    if (animation) {
+      elevator.setAttribute("animation", animation.elevator);
+      camera.setAttribute("animation", animation.camera);
+    }
+  }
+
+  function jumpCamera() {
+    const position = camera.getAttribute("position");
+    const initialY = position.y;
+    const jumpHeight = 1;
+    const jumpDuration = 500;
+
+    $(camera).animate(
+      { y: initialY + jumpHeight },
+      {
+        duration: jumpDuration / 2,
+        step: (now) => camera.setAttribute("position", { x: position.x, y: now, z: position.z }),
+        complete: () => {
+          $(camera).animate(
+            { y: initialY },
+            {
+              duration: jumpDuration / 2,
+              step: (now) => camera.setAttribute("position", { x: position.x, y: now, z: position.z }),
+            }
+          );
+        },
+      }
+    );
+  }
+
+  function setupEventListeners() {
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "2") applyAnimation("ascend2");
+      else if (event.key === "1") applyAnimation("descend");
+      else if (event.key === "3") applyAnimation("ascend3");
+    });
+
+    $(document).keydown((event) => {
+      if (event.code === "Space") jumpCamera();
+    });
+  }
+
+  setupEventListeners();
+}
+      
+      
+      
+document.addEventListener("DOMContentLoaded", () => {
+  // Wait for the A-Frame scene to load
+  const scene = document.querySelector("a-scene");
+  scene.addEventListener("loaded", () => {
+    // Call calculateZDistance at intervals of 1000ms (1 second)
+    setInterval(() => {
+      if (calculateZDistance() > 0.5) {
+        // Trigger the animation on the camera
+        const camera = document.querySelector("#camera");
+        if (camera) {
+          camera.setAttribute("animation", {
+            property: "position",
+            to: "0 0 0",
+            dur: 2000,
+            easing: "easeInOutQuad"
+          });
+        }
+      }
+    }, 1000);
+  });
+});
+
+// Function to calculate z-distance
+function calculateZDistance() {
+  // Get the positions of the camera and elevator
+  const camera = document.querySelector("#camera");
+  const elevator = document.querySelector("#elevator");
+
+  if (camera && elevator) {
+    const cameraPosition = camera.object3D.position;
+    const elevatorPosition = elevator.object3D.position;
+
+    // Calculate the z-distance
+    const zDistance = Math.abs(cameraPosition.z - elevatorPosition.z);
+
+    console.log(zDistance);
+    return zDistance;
+  } else {
+    console.error("Camera or elevator element not found!");
+    return Infinity; // Default value when elements are not found
+  }
+}
+
+
+// Function to calculate z-distance
+function calculateZDistance() {
+  // Get the positions of the camera and elevator
+  const camera = document.querySelector("#camera");
+  const elevator = document.querySelector("#elevator");
+
+  if (camera && elevator) {
+    const cameraPosition = camera.object3D.position;
+    const elevatorPosition = elevator.object3D.position;
+
+    // Calculate the z-distance
+    const zDistance = Math.abs(cameraPosition.z - elevatorPosition.z);
+
+    console.log(zDistance);
+    // Display the result
+    // document.getElementById("output").innerText = `Z-Distance: ${zDistance.toFixed(2)} meters`;
+  } else {
+    console.error("Camera or elevator element not found!");
+  }
+}
+
     </script>
   </body>
 </html>
