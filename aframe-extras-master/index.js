@@ -1,5 +1,5 @@
-require('./src/controls');
-require('./src/loaders');
-require('./src/misc');
-require('./src/pathfinding');
-require('./src/primitives');
+import './src/controls';
+import './src/loaders';
+import './src/misc';
+import './src/pathfinding';
+import './src/primitives';
