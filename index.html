@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -7,229 +6,102 @@
     <title>Eiffel Tower VR Scene</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <style>
+      /* Styling for the overlay text */
+      .overlay-text {
+        display: none; /* Hidden by default */
+        font-size: 24px;
+        position: absolute;
+        top: 20vh; /* Adjust position as needed */
+        left: 20vw; /* Adjust position as needed */
+        color: white;
+        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+        padding: 10px;
+        border-radius: 8px;
+        z-index: 1000; /* Ensures it is above the A-Frame scene */
+      }
+    </style>
   </head>
   <body>
-    <a-scene>
-      <a-camera
-        id="camera"
-        position="-6.5 1.6 21"
-        wasd-controls="acceleration: 20"
-        aabb-collider="objects: .collidable">
-        <a-entity
-          cursor="rayOrigin: mouse"
-          raycaster="objects: .hoverable"
-          position="0 0 -1"
-          geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
-          material="color: red; shader: flat">
-        </a-entity>
-      </a-camera>
+<!--      <div id="speedDisplay">Speed: Waiting for motion data...</div> -->
+   
+      <a-scene vr-mode-ui>
+      <a-entity id="cameraRig" position="0 0.6 0">
+        <a-camera
+          id="camera"
+          look-controls
+          wasd-controls-enabled="false"
+          position="-6.5 1.0 21">
+        </a-camera>
+      </a-entity> 
 
       <!-- Environment -->
       <a-gltf-model
         src="https://cdn.glitch.global/628e1600-3177-4d17-ab74-7432cf0bcda8/low_poly_eiffel_tower.glb?v=1735896314497"
         position="0 0 1"
-        scale="1 1 1">
-      </a-gltf-model>
+        scale="1 1 1"
+      ></a-gltf-model>
 
       <!-- Man walking -->
       <a-gltf-model
         src="https://cdn.glitch.global/628e1600-3177-4d17-ab74-7432cf0bcda8/passive_marker_man_walking.glb?v=1736122091492"
         position="0 1 -3"
-        animation-mixer="clip: Run; loop: repeat; timeScale: 1;">
-      </a-gltf-model>
+        animation-mixer="clip: Run; loop: repeat; timeScale: 1;"
+      ></a-gltf-model>
 
       <!-- Elevator -->
       <a-gltf-model
         id="elevator"
         src="https://cdn.glitch.global/628e1600-3177-4d17-ab74-7432cf0bcda8/old_elevator%20(1).glb?v=1735935905371"
         position="0 1 2"
-        scale="0.01 0.01 0.01">
-      </a-gltf-model>
+        scale="0.01 0.01 0.01"
+      ></a-gltf-model>
 
-      <a-box id="elevator-collider"
+      <a-box
+        id="elevator-collider"
         position="0 1.6 2"
         depth="1"
         height="1"
         width="1"
         opacity="0"
-        visible="false">
-      </a-box>
+        visible="false"
+      ></a-box>
 
       <!-- Info Texts -->
-      <a-text look-at="#camera"
-              id="info1"
-              value="The Eiffel Tower quickly became an iconic symbol of Paris and France, captivating visitors from around the world with its grandeur and offering breathtaking panoramic views of the city."
-              position="-6 4 5" 
-              visible="true" 
-              align="center"
-              geometry="primitive: plane; height: 2; width: 5;"
-              material="shader: flat; side: double; transparent: true; opacity: 0.7; color: black;">
-      </a-text>
+      <a-text
+        look-at="#camera"
+        id="info1"
+        value="The Eiffel Tower quickly became an iconic symbol of Paris and France."
+        position="-6 4 5"
+        visible="true"
+        align="center"
+        material="shader: flat; side: double; transparent: true; opacity: 0.7; color: black;"
+      ></a-text>
 
-      <a-text look-at="#camera"
-              id="info2"
-              value="Eiffel Tower stands 330 meters (1,083 feet) tall, making it the tallest structure in Paris."
-              position="-10 2 13" 
-              rotation="0 90 0"  
-              visible="true" 
-              align="center"
-              geometry="primitive: plane; height: 2; width: 5;"
-              material="shader: flat; side: double; transparent: true; opacity: 0.7; color: black;">
-      </a-text>
+      <a-text
+        look-at="#camera"
+        id="info2"
+        value="Eiffel Tower stands 330 meters (1,083 feet) tall, making it the tallest structure in Paris."
+        position="-10 2 13"
+        rotation="0 90 0"
+        visible="true"
+        align="center"
+        material="shader: flat; side: double; transparent: true; opacity: 0.7; color: black;"
+      ></a-text>
 
-      <div id="output"></div>
+      <!-- Overlay Text -->
+      <div class="overlay-text" id="overlayText">YOU ARE DEAD!</div>
 
-      <a-light type="ambient" color="#888" intensity="4"></a-light>
+      <a-light
+        id="ambientLight"
+        type="ambient"
+        color="#888"
+        intensity="4"
+      ></a-light>
       <a-sky color="#ECECEC"></a-sky>
     </a-scene>
 
-    <script>
-      setupElevatorControls("#elevator", "#camera");
-
-
-  function setupElevatorControls(elevatorId, cameraId) {
-  const elevator = document.querySelector(elevatorId);
-  const camera = document.querySelector(cameraId);
-
-  const animations = {
-    ascend3: {
-      elevator: { property: "position", to: "0 10 2", dur: 2000, easing: "easeInOutQuad" },
-      camera: { property: "position", to: "0 10.6 2", dur: 2000, easing: "easeInOutQuad" },
-    },
-    ascend2: {
-      elevator: { property: "position", to: "0 5 2", dur: 2000, easing: "easeInOutQuad" },
-      camera: { property: "position", to: "0 5.6 2", dur: 2000, easing: "easeInOutQuad" },
-    },
-    descend: {
-      elevator: { property: "position", to: "0 1 2", dur: 2000, easing: "easeInOutQuad" },
-      camera: { property: "position", to: "0 1.6 2", dur: 2000, easing: "easeInOutQuad" },
-    },
-  };
-
-  function moveCameraForward() {
-    const position = camera.getAttribute("position");
-    const direction = new THREE.Vector3();
-    camera.object3D.getWorldDirection(direction);
-    direction.multiplyScalar(0.15);
-    position.x -= direction.x;
-    position.z -= direction.z;
-    camera.setAttribute("position", position);
-  }
-
-  function applyAnimation(animationKey) {
-    const animation = animations[animationKey];
-    if (animation) {
-      elevator.setAttribute("animation", animation.elevator);
-      camera.setAttribute("animation", animation.camera);
-    }
-  }
-
-  function jumpCamera() {
-    const position = camera.getAttribute("position");
-    const initialY = position.y;
-    const jumpHeight = 1;
-    const jumpDuration = 500;
-
-    $(camera).animate(
-      { y: initialY + jumpHeight },
-      {
-        duration: jumpDuration / 2,
-        step: (now) => camera.setAttribute("position", { x: position.x, y: now, z: position.z }),
-        complete: () => {
-          $(camera).animate(
-            { y: initialY },
-            {
-              duration: jumpDuration / 2,
-              step: (now) => camera.setAttribute("position", { x: position.x, y: now, z: position.z }),
-            }
-          );
-        },
-      }
-    );
-  }
-
-  function setupEventListeners() {
-    window.addEventListener("keydown", (event) => {
-      if (event.key === "2") applyAnimation("ascend2");
-      else if (event.key === "1") applyAnimation("descend");
-      else if (event.key === "3") applyAnimation("ascend3");
-    });
-
-    $(document).keydown((event) => {
-      if (event.code === "Space") jumpCamera();
-    });
-  }
-
-  setupEventListeners();
-}
-      
-      
-      
-document.addEventListener("DOMContentLoaded", () => {
-  // Wait for the A-Frame scene to load
-  const scene = document.querySelector("a-scene");
-  scene.addEventListener("loaded", () => {
-    // Call calculateZDistance at intervals of 1000ms (1 second)
-    setInterval(() => {
-      if (calculateZDistance() > 0.5) {
-        // Trigger the animation on the camera
-        const camera = document.querySelector("#camera");
-        if (camera) {
-          camera.setAttribute("animation", {
-            property: "position",
-            to: "0 0 0",
-            dur: 2000,
-            easing: "easeInOutQuad"
-          });
-        }
-      }
-    }, 1000);
-  });
-});
-
-// Function to calculate z-distance
-function calculateZDistance() {
-  // Get the positions of the camera and elevator
-  const camera = document.querySelector("#camera");
-  const elevator = document.querySelector("#elevator");
-
-  if (camera && elevator) {
-    const cameraPosition = camera.object3D.position;
-    const elevatorPosition = elevator.object3D.position;
-
-    // Calculate the z-distance
-    const zDistance = Math.abs(cameraPosition.z - elevatorPosition.z);
-
-    console.log(zDistance);
-    return zDistance;
-  } else {
-    console.error("Camera or elevator element not found!");
-    return Infinity; // Default value when elements are not found
-  }
-}
-
-
-// Function to calculate z-distance
-function calculateZDistance() {
-  // Get the positions of the camera and elevator
-  const camera = document.querySelector("#camera");
-  const elevator = document.querySelector("#elevator");
-
-  if (camera && elevator) {
-    const cameraPosition = camera.object3D.position;
-    const elevatorPosition = elevator.object3D.position;
-
-    // Calculate the z-distance
-    const zDistance = Math.abs(cameraPosition.z - elevatorPosition.z);
-
-    console.log(zDistance);
-    // Display the result
-    // document.getElementById("output").innerText = `Z-Distance: ${zDistance.toFixed(2)} meters`;
-  } else {
-    console.error("Camera or elevator element not found!");
-  }
-}
-
-    </script>
+    <script src="script.js"></script>
+    
   </body>
 </html>
