@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Eiffel Tower VR Scene</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script
+      <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.4/dist/aframe-extras.min.js"></script>
     <style>
       /* Styling for the overlay text */
       .overlay-text {
@@ -23,49 +24,41 @@
     </style>
   </head>
   <body>
-<!--      <div id="speedDisplay">Speed: Waiting for motion data...</div> -->
    
       <a-scene vr-mode-ui>
-      <a-entity id="cameraRig" position="0 0.6 0">
+      <a-entity 
+                id="cameraRig" 
+                position="0 0.6 0" 
+                aabb-collider="objects: .collidable"
+                collision-handler>
         <a-camera
           id="camera"
-          look-controls
-          wasd-controls-enabled="false"
+          kinematic-body
+          universal-controls
           position="-6.5 1.0 21">
         </a-camera>
       </a-entity> 
 
       <!-- Environment -->
       <a-gltf-model
+        class="collidable"
         src="https://cdn.glitch.global/628e1600-3177-4d17-ab74-7432cf0bcda8/low_poly_eiffel_tower.glb?v=1735896314497"
         position="0 0 1"
         scale="1 1 1"
       ></a-gltf-model>
+        
+      //ground
+    <a-grid static-body></a-grid>
 
-      <!-- Man walking -->
-      <a-gltf-model
-        src="https://cdn.glitch.global/628e1600-3177-4d17-ab74-7432cf0bcda8/passive_marker_man_walking.glb?v=1736122091492"
-        position="0 1 -3"
-        animation-mixer="clip: Run; loop: repeat; timeScale: 1;"
-      ></a-gltf-model>
 
       <!-- Elevator -->
       <a-gltf-model
+       class="collidable"
         id="elevator"
         src="https://cdn.glitch.global/628e1600-3177-4d17-ab74-7432cf0bcda8/old_elevator%20(1).glb?v=1735935905371"
         position="0 1 2"
         scale="0.01 0.01 0.01"
       ></a-gltf-model>
-
-      <a-box
-        id="elevator-collider"
-        position="0 1.6 2"
-        depth="1"
-        height="1"
-        width="1"
-        opacity="0"
-        visible="false"
-      ></a-box>
 
       <!-- Info Texts -->
       <a-text
@@ -101,7 +94,7 @@
       <a-sky color="#ECECEC"></a-sky>
     </a-scene>
 
-    <script src="script.js"></script>
-    
+    <script src="cameraMovement.js"></script>
+    <script src="colider.js"></script>
   </body>
 </html>
